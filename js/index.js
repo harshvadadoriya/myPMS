@@ -14,11 +14,11 @@ function generateString(length) {
 	return result;
 }
 
-// Dynamically Store Prdouct Id
+// Dynamically Store Product Id
 let prodId = (document.querySelector('#inputProductId').value =
 	generateString(5));
 
-// testing Image and workin file
+// get Image file
 document
 	.getElementById('inputProductImage')
 	.addEventListener('change', (event) => {

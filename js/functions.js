@@ -5,7 +5,7 @@ export function showProducts() {
 	const getProdCard = document.querySelector('.products-card');
 	// below line is the Id number
 	let ind = 1;
-	// below line will stop printing all firstname and email of previous users
+	// below line will stop printing all firstName and email of previous users
 	getProdCard.innerHTML = '';
 	let _userData = JSON.parse(localStorage.getItem('Products')) || [];
 	const arr = _userData.map((obj) => {
@@ -29,7 +29,7 @@ export function showProducts() {
       </div>
   
     </div>
-    <div class="buttons" data-id=${obj.prodId}><button class="btn btn-primary">Edit</button>
+    <div class="buttons" data-id=${obj.prodId}><button class="btn btn-primary" id="prodEdit">Edit</button>
     <button class="btn btn-danger" id="prodDelete">Delete</button>
     </div>
     </div>`;
@@ -49,7 +49,7 @@ function getCrudData() {
 	return prodData;
 }
 
-function deleteCardFromLocalStorage(cardId) {
+function deleteProduct(cardId) {
 	// Get the current list of cards from local storage
 	const inputData = getCrudData();
 
@@ -79,7 +79,7 @@ deleteButtons.forEach((button) => {
 		// console.log(cardName);
 
 		// Delete the card from local storage
-		deleteCardFromLocalStorage(cardId);
+		deleteProduct(cardId);
 
 		// Remove the card from the DOM
 		event.target.closest('.card').remove();
