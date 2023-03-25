@@ -106,6 +106,12 @@ svg {
 	background-color: #ffcaa6;
 }
 
+/* No data found img  */
+.no-data-found {
+	width: 550px;
+	height: auto;
+}
+
 @media screen and (max-width: 768px) {
 	.navbar-nav .nav-item:first-child {
 		margin-left: 0px;
