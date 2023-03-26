@@ -15,7 +15,7 @@ export function showProducts() {
       </div>
       <div class="card-info" data-id=${obj.prodName}>
         <p id="prodId">#${obj.prodId}</p>
-        <p class="text-title">${obj.prodName}</p>
+        <p class="text-title" name="prodName">${obj.prodName}</p>
         <p class="text-body">${obj.prodDescription}</p>
       </div>
       <div class="card-footer">
@@ -28,7 +28,8 @@ export function showProducts() {
         </svg>
       </div>
     </div>
-    <div class="buttons" data-id=${obj.prodId}><button class="btn btn-primary" id="prodEdit">Edit</button>
+    <div class="buttons" data-id=${obj.prodId}><button type="button" data-bs-toggle="modal"
+	data-bs-target="#exampleModal"class="btn btn-primary card-link" id="prodEdit">Edit</button>
     <button class="btn btn-danger" id="prodDelete">Delete</button>
     </div>
     </div>`;
@@ -51,6 +52,7 @@ function getCrudData() {
 	return prodData;
 }
 
+// function to delete products
 function deleteProduct(cardId) {
 	// Get the current list of cards from local storage
 	const inputData = getCrudData();
@@ -88,5 +90,72 @@ deleteButtons.forEach((button) => {
 
 		// console.log(cardId);
 		showToast(`#${cardId} product deleted`, 'bg-danger');
+	});
+});
+
+// function to update products
+function updateProducts(cardId) {
+	let showModal = document.getElementById('modal');
+	// console.log(showModal);
+	let products = getCrudData();
+	products.forEach((elem) => {
+		if (elem.prodId == cardId) {
+			let index = products.indexOf(elem);
+			// console.log(index);
+			// console.log(elem.prodDescription);
+			showModal.innerHTML = `
+        	<div class="modal-header">
+          		<h5 class="modal-title" id="exampleModalLabel">Edit Product Details</h5>
+          		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          	</div>
+           	<div class="modal-body">
+				<form>
+					<div class="form-group">
+						<label class="form-label" for="productId">Product Id <b>#</b></label>
+						<input type="text" class="form-control" id="productId" placeholder="Product Id" value=${elem.prodId} disabled required>
+					</div>
+					<div class="form-group">
+						<label class="form-label mt-2" for="productName">Update Name</label> 
+						<input type="text" class="form-control" id="productName" placeholder="Product Name" value=${elem.prodName} required>
+					</div>
+					<div class="form-group">
+						<label class="form-label mt-2" for="productPrice">Update Price <b>₹</b></label>
+						<input type="number" class="form-control" id="productPrice" placeholder="Product Price" value=${elem.prodPrice} required>
+					</div>
+					<div class="form-group">
+						<label class="form-label mt-2" for="productImage">Old Image</label><br>
+						<img class="img img-thumbnail mt-2" src=${elem.prodImage}>
+					</div>
+					<div class="form-row">
+						<div class="form-group col-md-6">
+						<label class="form-label mt-2" for="productImage">Choose New Image</label>
+						<input type="file" class="form-control" id="productImage" accept="image/png, image/jpeg" value=${elem.prodImage} required>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label mt-2" for="productDescription">Update Description</label>
+						<textarea class="form-control" id="productDescription" placeholder="Product Description" rows="3">${elem.prodDescription}</textarea>
+					</div>
+					
+				</form>
+          	</div>
+        	<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        		<button type="button" class="btn btn-primary">Save changes</button>
+       	 	</div>`;
+			return;
+			// continue from here.................
+		}
+	});
+}
+
+// function to edit products
+const editButtons = document.querySelectorAll('#prodEdit');
+editButtons.forEach((button) => {
+	button.addEventListener('click', (event) => {
+		const cardId = event.target.closest('.buttons').dataset.id;
+		// updateProducts(parseFloat(cardId));
+		updateProducts(cardId);
+		// console.log(cardId);
 	});
 });

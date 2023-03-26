@@ -112,6 +112,11 @@ svg {
 	height: auto;
 }
 
+.img-thumbnail {
+	height: 200px;
+	width: 200px;
+}
+
 @media screen and (max-width: 768px) {
 	.navbar-nav .nav-item:first-child {
 		margin-left: 0px;
