@@ -104,7 +104,7 @@ function addEdit() {
 	editButton.forEach((button) => {
 		button.addEventListener('click', (event) => {
 			const cardId = event.target.closest('.buttons').dataset.id;
-			console.log(cardId);
+			// console.log(cardId);
 			myModal.show();
 			updateProductsModal(cardId);
 		});
@@ -185,9 +185,9 @@ function updateProducts(cardId) {
 }
 
 // event listener for search input field
-document
-	.getElementById('searchProduct')
-	.addEventListener('input', searchProductsByName);
+// document
+// 	.getElementById('searchProduct')
+// 	.addEventListener('input', searchProductsByName);
 
 // -----------------------Testing code for filter and sort-----------------------
 function searchProductsByName() {
@@ -208,36 +208,82 @@ let configureObj = {
 };
 
 function getTargetedData() {
-	let arr = getCrudData(); //to filter with input
-	arr = arr.filter((obj) => {
-		if (obj.prodName.includes(configureObj.input)) {
-			return true;
-		}
-		return false;
-	});
+	let arr = getCrudData();
 
-	arr = arr.sort((obj1, obj2) => {
-		if (configureObj.filter === 'optName') {
-			return obj2[filter].charAt(0).toLowerCase() <
-				obj1[filter].charAt(0).toLowerCase()
-				? 1
-				: -1;
-		} else if (configureObj.filter === 'optId') {
-			return obj2[filter].charAt(0).toLowerCase() <
-				obj1[filter].charAt(0).toLowerCase()
-				? 1
-				: -1;
-		} else if (configureObj.filter === 'optPrice') {
-			return obj2[filter].charAt(0).toLowerCase() <
-				obj1[filter].charAt(0).toLowerCase()
-				? 1
-				: -1;
-		}
-	});
-
-	if (configureObj.sort === 'Desc') {
-		arr = arr.reverse();
+	if (configureObj.input) {
+		arr = arr.filter((obj) =>
+			obj.prodName.toLowerCase().includes(configureObj.input.toLowerCase())
+		);
 	}
+
+	const compareFn = (a, b) => {
+		let valueA, valueB;
+
+		if (configureObj.filter === 'optId') {
+			valueA = parseInt(a.prodId);
+			valueB = parseInt(b.prodId);
+		} else if (configureObj.filter === 'optName') {
+			valueA = a.prodName.toLowerCase();
+			valueB = b.prodName.toLowerCase();
+			// compare alphanumeric values
+			if (valueA < valueB) {
+				return configureObj.sort === 'optAsc' ? -1 : 1;
+			} else if (valueA > valueB) {
+				return configureObj.sort === 'optAsc' ? 1 : -1;
+			} else {
+				return 0;
+			}
+		} else if (configureObj.filter === 'optPrice') {
+			valueA = parseInt(a.prodPrice.replace(/[^0-9.-]+/g, ''));
+			valueB = parseInt(b.prodPrice.replace(/[^0-9.-]+/g, ''));
+		}
+
+		return configureObj.sort === 'optAsc' ? valueA - valueB : valueB - valueA;
+	};
+
+	// this compareFn working good except prodName
+	// const compareFn = (a, b) => {
+	// 	let valueA, valueB;
+
+	// 	if (configureObj.filter === 'optId') {
+	// 		valueA = parseInt(a.prodId);
+	// 		valueB = parseInt(b.prodId);
+	// 	} else if (configureObj.filter === 'optName') {
+	// 		valueA = a.prodName.toLowerCase();
+	// 		valueB = b.prodName.toLowerCase();
+	// 	} else if (configureObj.filter === 'optPrice') {
+	// 		valueA = parseInt(a.prodPrice.replace(/[^0-9.-]+/g, ''));
+	// 		valueB = parseInt(b.prodPrice.replace(/[^0-9.-]+/g, ''));
+	// 	}
+
+	// 	return configureObj.sort === 'optAsc' ? valueA - valueB : valueB - valueA;
+	// };
+
+	arr.sort(compareFn);
 	console.log(arr);
 	return arr;
 }
+
+// event listener for search input field
+const searchInput = document.getElementById('searchProduct');
+searchInput.addEventListener('input', (e) => {
+	configureObj.input = e.target.value;
+	searchProductsByName();
+	showProducts(getTargetedData());
+});
+
+//event listener for products filter
+const selectFilter = document.getElementById('productFilter');
+selectFilter.addEventListener('change', function (e) {
+	configureObj.filter = e.target.value;
+	// getTargetedData();
+	showProducts(getTargetedData());
+});
+
+//event listener for products sort
+const selectSort = document.getElementById('productSort');
+selectSort.addEventListener('change', function (e) {
+	configureObj.sort = e.target.value;
+	// getTargetedData();
+	showProducts(getTargetedData());
+});
