@@ -3,6 +3,7 @@
 	padding: 0;
 	box-sizing: border-box;
 	font-family: 'Montserrat', sans-serif;
+	font-family: 'Poppins', sans-serif;
 	/* font-family: 'Ropa Sans', sans-serif; */
 }
 
@@ -82,7 +83,7 @@ form {
 	transition: all 0.2s linear;
 	cursor: pointer;
 	border: none;
-	background: #0d6efd;
+	background: #007bff;
 }
 
 .goBack > svg {
@@ -205,5 +206,8 @@ svg {
 	}
 	.product-details {
 		margin-top: 30px;
+	}
+	.filter {
+		margin-top: 10px;
 	}
 }

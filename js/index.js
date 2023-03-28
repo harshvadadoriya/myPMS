@@ -1,22 +1,16 @@
 import { showToast } from './bootStrapAlert.js';
 
-// function to generate random Product Id
-const characters =
-	'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-function generateString(length) {
-	let result = '';
-	const charactersLength = characters.length;
-	for (let i = 0; i < length; i++) {
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	}
-
-	return result;
+function generateRandom(min = 0, max = 10000) {
+	let difference = max - min;
+	let rand = Math.random();
+	rand = Math.floor(rand * difference);
+	rand = rand + min;
+	return rand;
 }
 
 // Dynamically Store Product Id
 let prodId = (document.querySelector('#inputProductId').value =
-	generateString(5));
+	generateRandom());
 
 // get Image file
 document
@@ -61,7 +55,7 @@ productSubmitBtn.addEventListener('click', () => {
 
 		// console.log(inputData);
 
-		document.querySelector('#inputProductId').value = generateString(5);
+		document.querySelector('#inputProductId').value = generateRandom();
 		document.querySelector('#inputProductName').value = '';
 		document.querySelector('#inputProductPrice').value = '';
 		document.querySelector('#inputProductImage').value = '';

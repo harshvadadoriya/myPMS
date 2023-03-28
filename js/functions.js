@@ -1,13 +1,23 @@
 import { showToast } from './bootStrapAlert.js';
 
+// common function to read localStorage Data
+function getCrudData() {
+	let prodData = JSON.parse(localStorage.getItem('Products')) || [];
+	return prodData;
+}
+
 // function to show all user data on screen in table
-export function showProducts() {
+export function showProducts(filteredProducts) {
+	let _userData;
+	if (filteredProducts == undefined) {
+		_userData = getCrudData();
+	} else {
+		_userData = filteredProducts;
+	}
 	const getProdCard = document.querySelector('.products-card');
-	// below line is the Id number
-	let ind = 1;
-	// below line will stop printing all firstName and email of previous users
+	// below line will stop printing details of old products
 	getProdCard.innerHTML = '';
-	let _userData = JSON.parse(localStorage.getItem('Products')) || [];
+	// let _userData = getCrudData();
 	const arr = _userData.map((obj) => {
 		return `<div class="card">
       <div class="card-img">
@@ -28,8 +38,7 @@ export function showProducts() {
         </svg>
       </div>
     </div>
-    <div class="buttons" data-id=${obj.prodId}><button type="button" data-bs-toggle="modal"
-	data-bs-target="#exampleModal"class="btn btn-primary card-link" id="prodEdit">Edit</button>
+    <div class="buttons" data-id=${obj.prodId}><button type="button" class="btn btn-primary card-link" id="prodEdit" data-bs-toggle="modal" data-bs-target="#myexampleModal">Edit</button>
     <button class="btn btn-danger" id="prodDelete">Delete</button>
     </div>
     </div>`;
@@ -43,14 +52,9 @@ export function showProducts() {
 		getProdCard.innerHTML =
 			'<img class="img-fluid no-data-found" src="/Asset/100465-no-data-found.gif">';
 	}
+	addEdit();
 }
 showProducts();
-
-// common function to read localStorage Data
-function getCrudData() {
-	let prodData = JSON.parse(localStorage.getItem('Products')) || [];
-	return prodData;
-}
 
 // function to delete products
 function deleteProduct(cardId) {
@@ -93,69 +97,147 @@ deleteButtons.forEach((button) => {
 	});
 });
 
+// event listener to open edit products modal
+function addEdit() {
+	const myModal = new bootstrap.Modal('#myexampleModal');
+	const editButton = document.querySelectorAll('#prodEdit');
+	editButton.forEach((button) => {
+		button.addEventListener('click', (event) => {
+			const cardId = event.target.closest('.buttons').dataset.id;
+			console.log(cardId);
+			myModal.show();
+			updateProductsModal(cardId);
+		});
+	});
+}
+
 // function to update products
-function updateProducts(cardId) {
-	let showModal = document.getElementById('modal');
-	// console.log(showModal);
+function updateProductsModal(cardId) {
 	let products = getCrudData();
-	products.forEach((elem) => {
-		if (elem.prodId == cardId) {
-			let index = products.indexOf(elem);
-			// console.log(index);
-			// console.log(elem.prodDescription);
-			showModal.innerHTML = `
-        	<div class="modal-header">
-          		<h5 class="modal-title" id="exampleModalLabel">Edit Product Details</h5>
-          		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          	</div>
-           	<div class="modal-body">
-				<form>
-					<div class="form-group">
-						<label class="form-label" for="productId">Product Id <b>#</b></label>
-						<input type="text" class="form-control" id="productId" placeholder="Product Id" value=${elem.prodId} disabled required>
-					</div>
-					<div class="form-group">
-						<label class="form-label mt-2" for="productName">Update Name</label> 
-						<input type="text" class="form-control" id="productName" placeholder="Product Name" value=${elem.prodName} required>
-					</div>
-					<div class="form-group">
-						<label class="form-label mt-2" for="productPrice">Update Price <b>₹</b></label>
-						<input type="number" class="form-control" id="productPrice" placeholder="Product Price" value=${elem.prodPrice} required>
-					</div>
-					<div class="form-group">
-						<label class="form-label mt-2" for="productImage">Old Image</label><br>
-						<img class="img img-thumbnail mt-2" src=${elem.prodImage}>
-					</div>
-					<div class="form-row">
-						<div class="form-group col-md-6">
-						<label class="form-label mt-2" for="productImage">Choose New Image</label>
-						<input type="file" class="form-control" id="productImage" accept="image/png, image/jpeg" value=${elem.prodImage} required>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="form-label mt-2" for="productDescription">Update Description</label>
-						<textarea class="form-control" id="productDescription" placeholder="Product Description" rows="3">${elem.prodDescription}</textarea>
-					</div>
-					
-				</form>
-          	</div>
-        	<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        		<button type="button" class="btn btn-primary">Save changes</button>
-       	 	</div>`;
-			return;
-			// continue from here.................
+	// console.log(products);
+	products.forEach((obj) => {
+		if (obj.prodId == cardId) {
+			document.querySelector('#productId').value = obj.prodId;
+			document.querySelector('#productName').innerText = obj.prodName;
+			document.querySelector('#productPrice').value = obj.prodPrice;
+			document.querySelector('#old-image').src = obj.prodImage;
+			document.querySelector('#productDescription').value = obj.prodDescription;
 		}
 	});
 }
 
-// function to edit products
-const editButtons = document.querySelectorAll('#prodEdit');
-editButtons.forEach((button) => {
-	button.addEventListener('click', (event) => {
-		const cardId = event.target.closest('.buttons').dataset.id;
-		// updateProducts(parseFloat(cardId));
-		updateProducts(cardId);
+// event listener for update product function
+const productUpdate = document.querySelectorAll('#prodUpdate');
+productUpdate.forEach((btn) => {
+	btn.addEventListener('click', (event) => {
+		const cardId = document.getElementById('productId').value;
 		// console.log(cardId);
+		updateProducts(cardId);
 	});
 });
+
+// get Image file
+document.getElementById('productImage').addEventListener('change', (event) => {
+	let input = event.target;
+	let reader = new FileReader();
+	reader.onload = function () {
+		let dataURL = reader.result;
+		// console.log(dataURL);
+		// document.getElementById("inputProductImage") = dataURL;
+		let prodImage = document.getElementById('productImage');
+		prodImage.src = dataURL;
+	};
+	reader.readAsDataURL(input.files[0]);
+});
+
+// function to update product details
+function updateProducts(cardId) {
+	let prodId = document.getElementById('productId').value,
+		prodName = document.getElementById('productName').value,
+		prodPrice = document.getElementById('productPrice').value,
+		prodImage = document.getElementById('productImage').src,
+		prodDescription = document.getElementById('productDescription').value;
+	if (
+		prodId == '' ||
+		prodName == '' ||
+		prodPrice == '' ||
+		prodImage == '' ||
+		prodDescription == ''
+	) {
+		showToast('Please fill all the fields', 'bg-danger');
+	} else {
+		const oldProductsData = getCrudData();
+		oldProductsData.forEach((elem) => {
+			if (elem.prodId == cardId) {
+				let index = oldProductsData.indexOf(elem);
+				// console.log(index);
+				oldProductsData[index].prodId = prodId;
+				oldProductsData[index].prodName = prodName;
+				oldProductsData[index].prodPrice = prodPrice;
+				oldProductsData[index].prodImage = prodImage;
+				oldProductsData[index].prodDescription = prodDescription;
+			}
+			localStorage.setItem('Products', JSON.stringify(oldProductsData));
+			showToast(`#${cardId} Product updated successfully`, 'bg-success');
+		});
+	}
+	showProducts();
+}
+
+// event listener for search input field
+document
+	.getElementById('searchProduct')
+	.addEventListener('input', searchProductsByName);
+
+// -----------------------Testing code for filter and sort-----------------------
+function searchProductsByName() {
+	const searchInput = document.getElementById('searchProduct');
+	const products = getCrudData(); // console.log(searchInput.value);
+	const filteredProducts = products.filter((product) => {
+		return product.prodName
+			.toLowerCase()
+			.includes(searchInput.value.toLowerCase());
+	}); // console.log(filteredProducts);
+	showProducts(filteredProducts);
+}
+
+let configureObj = {
+	input: '',
+	filter: 'optId',
+	sort: 'optAsc',
+};
+
+function getTargetedData() {
+	let arr = getCrudData(); //to filter with input
+	arr = arr.filter((obj) => {
+		if (obj.prodName.includes(configureObj.input)) {
+			return true;
+		}
+		return false;
+	});
+
+	arr = arr.sort((obj1, obj2) => {
+		if (configureObj.filter === 'optName') {
+			return obj2[filter].charAt(0).toLowerCase() <
+				obj1[filter].charAt(0).toLowerCase()
+				? 1
+				: -1;
+		} else if (configureObj.filter === 'optId') {
+			return obj2[filter].charAt(0).toLowerCase() <
+				obj1[filter].charAt(0).toLowerCase()
+				? 1
+				: -1;
+		} else if (configureObj.filter === 'optPrice') {
+			return obj2[filter].charAt(0).toLowerCase() <
+				obj1[filter].charAt(0).toLowerCase()
+				? 1
+				: -1;
+		}
+	});
+
+	if (configureObj.sort === 'Desc') {
+		arr = arr.reverse();
+	}
+	console.log(arr);
+	return arr;
+}
